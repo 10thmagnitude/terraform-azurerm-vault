@@ -276,7 +276,6 @@ function run {
   assert_not_empty "--azure-account-key" "$azure_account_key"
   assert_not_empty "--azure-container" "$azure_container"
 
-  assert_is_installed "supervisorctl"
   assert_is_installed "az"
   assert_is_installed "curl"
   assert_is_installed "jq"

@@ -81,12 +81,6 @@ Give Vault permissions to make the `mlock` (memory lock) syscall. This syscall i
 Vault's memory to disk. For more info, see: https://www.vaultproject.io/docs/configuration/#disable_mlock.
 
 
-### Install supervisord
-
-Install [supervisord](http://supervisord.org/). We use it as a cross-platform supervisor to ensure Vault is started
-whenever the system boots and restarted if the Vault process crashes.
-
-
 ### Follow-up tasks
 
 After the `install-vault` script finishes running, you may wish to do the following:

@@ -1,0 +1,16 @@
+[Unit]
+Description=vault
+Documentation=https://www.vaultproject.io/
+
+[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=180
+StartLimitBurst=30
+ExecStart=/usr/local/bin/vault server -config=/etc/vault/config/
+ExecReload=/bin/kill -s HUP $MAINPID
+KillSignal=SIGINT
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target
