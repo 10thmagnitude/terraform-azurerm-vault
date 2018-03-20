@@ -151,7 +151,7 @@ function install_binaries {
 # For more info, see: https://www.vaultproject.io/docs/configuration/#disable_mlock
 function configure_mlock {
   echo "Giving Vault permission to use the mlock syscall"
-  sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+  sudo setcap cap_ipc_lock=+ep $(readlink -f $SYSTEM_BIN_DIR/vault)
 }
 
 function install {
