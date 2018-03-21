@@ -61,7 +61,7 @@ module "consul_servers" {
   source = "../terraform-azurerm-consul/modules/consul-cluster"
 
   cluster_prefix = "${var.consul_cluster_name}"
-  cluster_size   = "${var.num_consul_servers}"
+  cluster_size   = "${var.consul_num_servers}"
   key_data       = "${var.key_data}"
 
   # To make testing easier, we allow Consul and SSH requests from any IP address here but in a production
@@ -73,6 +73,7 @@ module "consul_servers" {
   resource_group_name = "${azurerm_resource_group.vault.name}"
 
   location             = "${var.location}"
+  instance_size        = "${var.instance_size}"
   admin_user_name      = "${var.admin_user_name}"
   bastion_host_address = "${data.azurerm_public_ip.bastion.ip_address}"
   private_key_path     = "${file(var.private_key_path)}"
@@ -92,16 +93,22 @@ module "vault_servers" {
   source = "./modules/vault-cluster"
 
   cluster_name = "${var.vault_cluster_name}"
-  cluster_size = "${var.num_vault_servers}"
+
+  # cluster_size = "${var.vault_num_servers}"
+  cluster_size = 1
   key_data     = "${var.key_data}"
 
   resource_group_name = "${azurerm_resource_group.vault.name}"
 
   location                 = "${var.location}"
   instance_size            = "${var.instance_size}"
+  admin_user_name          = "${var.admin_user_name}"
+  bastion_host_address     = "${data.azurerm_public_ip.bastion.ip_address}"
+  private_key_path         = "${file(var.private_key_path)}"
   image_id                 = "${data.azurerm_image.vault.id}"
   subnet_id                = "${azurerm_subnet.vault.id}"
   consul_cluster_addresses = ["${module.consul_servers.cluster_ip_addresses}"]
+  consul_http_api_port     = "${module.consul_servers.consul_http_api_port}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -121,6 +128,13 @@ resource "azurerm_public_ip" "bastion" {
   idle_timeout_in_minutes      = 30
 }
 
+resource "azurerm_subnet" "dmz" {
+  name                 = "dmz"
+  resource_group_name  = "${azurerm_resource_group.vault.name}"
+  virtual_network_name = "${azurerm_virtual_network.vault.name}"
+  address_prefix       = "10.0.0.0/24"
+}
+
 resource "azurerm_network_interface" "bastion" {
   name                = "bastion-nic"
   location            = "${azurerm_resource_group.vault.location}"
@@ -128,7 +142,7 @@ resource "azurerm_network_interface" "bastion" {
 
   ip_configuration {
     name                          = "ip-cfg"
-    subnet_id                     = "${azurerm_subnet.consul.id}"
+    subnet_id                     = "${azurerm_subnet.dmz.id}"
     private_ip_address_allocation = "dynamic"
     public_ip_address_id          = "${azurerm_public_ip.bastion.id}"
   }
@@ -139,7 +153,7 @@ resource "azurerm_virtual_machine" "bastion" {
   location                      = "${azurerm_resource_group.vault.location}"
   resource_group_name           = "${azurerm_resource_group.vault.name}"
   network_interface_ids         = ["${azurerm_network_interface.bastion.id}"]
-  vm_size                       = "Standard_A1_v2"
+  vm_size                       = "${var.instance_size}"
   delete_os_disk_on_termination = true
 
   storage_image_reference {

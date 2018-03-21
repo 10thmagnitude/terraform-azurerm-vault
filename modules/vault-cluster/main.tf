@@ -8,8 +8,9 @@ data "template_file" "consul" {
 
   vars {
     location              = "${var.location}"
-    consul_client_name    = "${azurerm_virtual_machine.vault.*.name[count.index]}"
+    consul_client_name    = "${format("${var.vault_computer_name_prefix}-%02d", 1 + count.index)}"
     consul_join_addresses = "${jsonencode(var.consul_cluster_addresses)}"
+    http_port             = "${var.consul_http_api_port}"
   }
 }
 
@@ -85,7 +86,7 @@ resource "azurerm_virtual_machine" "vault" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.vault.*.rendered[count.index]}"
+    content     = "${data.template_file.consul.*.rendered[count.index]}"
     destination = "/tmp/config.json.moveme"
   }
 
@@ -108,7 +109,7 @@ resource "azurerm_virtual_machine" "vault" {
 
   connection {
     user         = "${var.admin_user_name}"
-    host         = "${azurerm_network_interface.consul.*.private_ip_address[count.index]}"
+    host         = "${azurerm_network_interface.vault.*.private_ip_address[count.index]}"
     private_key  = "${var.private_key_path}"
     bastion_host = "${var.bastion_host_address}"
   }

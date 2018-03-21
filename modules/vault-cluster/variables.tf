@@ -31,6 +31,14 @@ variable "key_data" {
   description = "The SSH public key that will be added to SSH authorized_users on the consul instances"
 }
 
+variable "private_key_path" {
+  description = "The local path of the ssh private key"
+}
+
+variable "bastion_host_address" {
+  description = "The ip address of the bastion host"
+}
+
 variable "consul_cluster_addresses" {
   description = "Addresses* of consul servers in cluster to join."
   type        = "list"
@@ -116,6 +124,11 @@ variable "api_port" {
 variable "cluster_port" {
   description = "The port to use for Vault cluster server-to-server requests. Vault default is 8201"
   default     = 8201
+}
+
+variable "consul_http_api_port" {
+  description = "The port used by consul http api.  Consul default is 8500."
+  default     = 8500
 }
 
 variable "tls_cert_path" {
