@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+# Send the log output from this script to custom-data.log, syslog, and the console
+exec > >(tee /var/log/custom-data.log|logger -t custom-data -s 2>/dev/console) 2>&1
+
+sudo mv /tmp/config.json.moveme /etc/consul/config/config.json
+sudo mv /tmp/default.hcl.moveme /etc/vault/config/default.hcl
+
+sudo chown consul:consul /etc/consul/config/config.json
+sudo chown vault:vault /etc/vault/config/default.hcl
+
+systemctl daemon-reload
+systemctl start consul.service
+systemctl enable consul.service
+
+systemctl start vault.service
+systemctl enable vault.service

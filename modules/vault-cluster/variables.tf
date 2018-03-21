@@ -11,20 +11,12 @@ variable "resource_group_name" {
   description = "The name of the resource group that the resources for consul will run in"
 }
 
-variable "storage_account_name" {
-  description = "The name of the storage account that will be used for images"
-}
-
 variable "subnet_id" {
   description = "The id of the subnet to deploy the cluster into"
 }
 
 variable "cluster_name" {
   description = "The name of the Consul cluster (e.g. consul-stage). This variable is used to namespace all resources created by this module."
-}
-
-variable "storage_container_name" {
-  description = "The name of the Azure Storage Container where secrets will be kept."
 }
 
 variable "image_id" {
@@ -37,6 +29,11 @@ variable "instance_size" {
 
 variable "key_data" {
   description = "The SSH public key that will be added to SSH authorized_users on the consul instances"
+}
+
+variable "consul_cluster_addresses" {
+  description = "Addresses* of consul servers in cluster to join."
+  type        = "list"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -112,6 +109,21 @@ variable "root_volume_delete_on_termination" {
 }
 
 variable "api_port" {
-  description = "The port to use for Vault API calls"
+  description = "The port to use for Vault API calls. Vault default is 8200"
   default     = 8200
+}
+
+variable "cluster_port" {
+  description = "The port to use for Vault cluster server-to-server requests. Vault default is 8201"
+  default     = 8201
+}
+
+variable "tls_cert_path" {
+  description = "Specifies the path to the certificate for TLS. Required. To use a CA certificate, concatenate the primary certificate and the CA certificate together."
+  default     = "/etc/vault/tls/vault.crt.pem"
+}
+
+variable "tls_key_path" {
+  description = "Specifies the path to the private key for the certificate."
+  default     = "/etc/vault/tls/vault.key.pem"
 }

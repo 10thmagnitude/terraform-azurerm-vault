@@ -1,0 +1,21 @@
+# todo:  TLS for consul?
+storage "consul" {
+  address = "127.0.0.1:8500"
+  path    = "vault/"
+  scheme  = "http"
+  service = "vault"
+
+  # HA settings
+  api_addr      = "https://${instance_ip_address}:${cluster_port}"
+  cluster_addr  = "https://${instance_ip_address}:${cluster_port}"
+}
+
+listener "tcp" {
+# address         = "0.0.0.0:${port}"
+# cluster_address = "0.0.0.0:${cluster_port}"
+  tls_cert_file   = "${tls_cert_file}"
+  tls_key_file    = "${tls_key_file}"
+  tls_min_version = "tls12"
+}
+
+ui = true

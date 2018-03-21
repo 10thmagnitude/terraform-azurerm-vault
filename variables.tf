@@ -21,15 +21,7 @@ variable "client_secret" {
 variable "image_resource_group_name" {}
 
 variable "resource_group_name" {
-  description = "The name of the Azure resource group consul will be deployed into. This RG should already exist"
-}
-
-variable "storage_account_name" {
-  description = "The name of an Azure Storage Account. This SA should already exist"
-}
-
-variable "storage_account_key" {
-  description = "The key for storage_account_name."
+  default = "catavault"
 }
 
 variable "image_regex" {
@@ -50,11 +42,6 @@ variable "private_key_path" {
   default = "~/.ssh/hal_vault_admin_rsa"
 }
 
-variable "allowed_inbound_cidr_blocks" {
-  description = "A list of CIDR-formatted IP address ranges from which the Azure Instances will allow connections to Consul"
-  type        = "list"
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
@@ -64,14 +51,19 @@ variable "location" {
   default     = "East US"
 }
 
-variable "address_space" {
+variable "test_address_space" {
   description = "The supernet for the resources that will be created"
   default     = "10.0.0.0/16"
 }
 
-variable "subnet_address" {
+variable "test_consul_subnet_address" {
   description = "The subnet that consul resources will be deployed into"
   default     = "10.0.10.0/24"
+}
+
+variable "test_vault_subnet_address" {
+  description = "The subnet that vault resources will be deployed into"
+  default     = "10.0.11.0/24"
 }
 
 variable "consul_cluster_name" {

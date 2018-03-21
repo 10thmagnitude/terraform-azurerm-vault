@@ -2,14 +2,28 @@ terraform {
   required_version = ">= 0.10.0"
 }
 
-#---------------------------------------------------------------------------------------------------------------------
-# CREATE STORAGE BUCKET
-# ---------------------------------------------------------------------------------------------------------------------
-resource "azurerm_storage_container" "vault" {
-  name                  = "${var.storage_container_name}"
-  resource_group_name   = "${var.resource_group_name}"
-  storage_account_name  = "${var.storage_account_name}"
-  container_access_type = "private"
+data "template_file" "consul" {
+  count    = "${var.cluster_size}"
+  template = "${file("${path.module}/files/consul-config-json")} "
+
+  vars {
+    location              = "${var.location}"
+    consul_client_name    = "${azurerm_virtual_machine.vault.*.name[count.index]}"
+    consul_join_addresses = "${jsonencode(var.consul_cluster_addresses)}"
+  }
+}
+
+data "template_file" "vault" {
+  count    = "${var.cluster_size}"
+  template = "${file("${path.module}/files/vault-config-hcl")}"
+
+  vars {
+    instance_ip_address = "${azurerm_network_interface.vault.*.private_ip_address[count.index]}"
+    port                = "${var.api_port}"
+    cluster_port        = "${var.cluster_port}"
+    tls_cert_file       = "${var.tls_cert_path}"
+    tls_key_file        = "${var.tls_key_path}"
+  }
 }
 
 #---------------------------------------------------------------------------------------------------------------------
@@ -70,37 +84,35 @@ resource "azurerm_virtual_machine" "vault" {
     }
   }
 
-  ## TODO: consul service user/group should be consul/consul?
   provisioner "file" {
-    source      = "${path.module}/files/consul-service"
-    destination = "/tmp/consul.service.moveme"
-  }
-
-  ## TODO: check recursors property in consul config for external DNS??
-  ## TODO: simplify consul configuration file, by grabbing username:
-  # $(echo `hostname`)
-  # $(ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $2}')
-
-  provisioner "file" {
-    content     = "${data.template_file.cfg.*.rendered[count.index]}"
+    content     = "${data.template_file.vault.*.rendered[count.index]}"
     destination = "/tmp/config.json.moveme"
   }
+
   provisioner "file" {
-    content     = "${file("${path.module}/files/consul-run")}"
-    destination = "/tmp/consul-run.sh"
+    content     = "${data.template_file.vault.*.rendered[count.index]}"
+    destination = "/tmp/default.hcl.moveme"
   }
+
+  provisioner "file" {
+    content     = "${file("${path.module}/files/vault-run-sh")}"
+    destination = "/tmp/vault-run.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sudo chmod +x /tmp/consul-run.sh",
-      "sudo /bin/bash -c /tmp/consul-run.sh",
+      "sudo chmod +x /tmp/vault-run.sh",
+      "sudo /bin/bash -c /tmp/vault-run.sh",
     ]
   }
+
   connection {
     user         = "${var.admin_user_name}"
     host         = "${azurerm_network_interface.consul.*.private_ip_address[count.index]}"
     private_key  = "${var.private_key_path}"
     bastion_host = "${var.bastion_host_address}"
   }
+
   lifecycle {
     ignore_changes = ["admin_password"]
   }

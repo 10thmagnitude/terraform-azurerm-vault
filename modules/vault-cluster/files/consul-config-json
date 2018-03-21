@@ -1,0 +1,10 @@
+{
+  "server": false,
+  "addresses": {
+    "http": "127.0.0.1:8500"
+  },
+  "datacenter": "${location}",
+  "data_dir": "/etc/consul/data/",
+  "node_name": "${consul_client_name}",
+  "retry-join": ${consul_join_addresses}
+}

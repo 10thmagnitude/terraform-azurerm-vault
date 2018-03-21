@@ -31,18 +31,25 @@ data "azurerm_image" "vault" {
 # ---------------------------------------------------------------------------------------------------------------------
 # CREATE THE NECESSARY NETWORK RESOURCES FOR THE EXAMPLE
 # ---------------------------------------------------------------------------------------------------------------------
-resource "azurerm_virtual_network" "consul" {
-  name                = "consulvn"
-  address_space       = ["${var.address_space}"]
-  location            = "${var.location}"
-  resource_group_name = "${var.resource_group_name}"
+resource "azurerm_virtual_network" "vault" {
+  name                = "vault"
+  address_space       = ["${var.test_address_space}"]
+  location            = "${azurerm_resource_group.vault.location}"
+  resource_group_name = "${azurerm_resource_group.vault.name}"
 }
 
 resource "azurerm_subnet" "consul" {
-  name                 = "consulsubnet"
-  resource_group_name  = "${var.resource_group_name}"
-  virtual_network_name = "${azurerm_virtual_network.consul.name}"
-  address_prefix       = "${var.subnet_address}"
+  name                 = "consul"
+  resource_group_name  = "${azurerm_resource_group.vault.name}"
+  virtual_network_name = "${azurerm_virtual_network.vault.name}"
+  address_prefix       = "${var.test_consul_subnet_address}"
+}
+
+resource "azurerm_subnet" "vault" {
+  name                 = "vault"
+  resource_group_name  = "${azurerm_resource_group.vault.name}"
+  virtual_network_name = "${azurerm_virtual_network.vault.name}"
+  address_prefix       = "${var.test_vault_subnet_address}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -50,7 +57,8 @@ resource "azurerm_subnet" "consul" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 module "consul_servers" {
-  source = "git::git@github.com:scottzilla/terraform-azurerm-consul.git//modules/consul-cluster"
+  # source = "git::git@github.com:scottzilla/terraform-azurerm-consul.git//modules/consul-cluster"
+  source = "../terraform-azurerm-consul/modules/consul-cluster"
 
   cluster_prefix = "${var.consul_cluster_name}"
   cluster_size   = "${var.num_consul_servers}"
@@ -58,12 +66,11 @@ module "consul_servers" {
 
   # To make testing easier, we allow Consul and SSH requests from any IP address here but in a production
   # deployment, we strongly recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
-  allowed_ssh_cidr_blocks = ["${list(var.address_space)}"]
+  allowed_ssh_cidr_blocks = ["${list(var.test_address_space)}"]
 
-  allowed_inbound_cidr_blocks = ["${list(var.address_space)}"]
+  allowed_inbound_cidr_blocks = ["${list(var.test_address_space)}"]
 
-  resource_group_name  = "${var.resource_group_name}"
-  storage_account_name = "${var.storage_account_name}"
+  resource_group_name = "${azurerm_resource_group.vault.name}"
 
   location             = "${var.location}"
   admin_user_name      = "${var.admin_user_name}"
@@ -72,16 +79,6 @@ module "consul_servers" {
   instance_size        = "${var.instance_size}"
   image_id             = "${data.azurerm_image.vault.id}"
   subnet_id            = "${azurerm_subnet.consul.id}"
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE THE STORAGE
-# ---------------------------------------------------------------------------------------------------------------------
-resource "azurerm_storage_container" "vault_storage" {
-  name                  = "vault"
-  resource_group_name   = "${var.resource_group_name}"
-  storage_account_name  = "${var.storage_account_name}"
-  container_access_type = "private"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -98,14 +95,13 @@ module "vault_servers" {
   cluster_size = "${var.num_vault_servers}"
   key_data     = "${var.key_data}"
 
-  resource_group_name  = "${var.resource_group_name}"
-  storage_account_name = "${var.storage_account_name}"
+  resource_group_name = "${azurerm_resource_group.vault.name}"
 
-  location               = "${var.location}"
-  instance_size          = "${var.instance_size}"
-  image_id               = "${data.azurerm_image.vault.id}"
-  subnet_id              = "${azurerm_subnet.consul.id}"
-  storage_container_name = "vault"
+  location                 = "${var.location}"
+  instance_size            = "${var.instance_size}"
+  image_id                 = "${data.azurerm_image.vault.id}"
+  subnet_id                = "${azurerm_subnet.vault.id}"
+  consul_cluster_addresses = ["${module.consul_servers.cluster_ip_addresses}"]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
