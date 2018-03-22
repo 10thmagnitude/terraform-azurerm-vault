@@ -1,13 +1,20 @@
 {
-  "server": false,
-  "addresses": {
-    "http": "127.0.0.1"
-  },
-  "ports": {
-    "http": ${http_port}
-  },
-  "datacenter": "${location}",
-  "data_dir": "/etc/consul/data/",
-  "node_name": "${consul_client_name}",
-  "retry_join": ${consul_join_addresses}
+  "node_name":        "${consul_client_name}",
+  "datacenter":       "${location}",
+  "data_dir":         "${consul_install_path}/data/",
+  "retry_join":       ${consul_join_addresses},
+  "addresses":        {
+                        "http": "127.0.0.1",
+                        "https": "127.0.0.1"
+                      },
+  "ports":            {
+                        "https": ${http_port}
+                      },
+  "encrypt":          "${gossip_encryption_key}",
+  "key_file":         "${tls_key_file_path}",
+  "cert_file":        "${tls_cert_file_path}",
+  "ca_file":          "${tls_ca_file_path}",
+  "verify_outgoing":  true,
+  "verify_incoming":  true,
+  "server":           false
 }

@@ -31,6 +31,10 @@ variable "key_data" {
   description = "The SSH public key that will be added to SSH authorized_users on the consul instances"
 }
 
+variable "gossip_encryption_key" {
+  description = "The encryption key for consul to encrypt gossip traffic"
+}
+
 variable "private_key_path" {
   description = "The local path of the ssh private key"
 }
@@ -42,6 +46,30 @@ variable "bastion_host_address" {
 variable "consul_cluster_addresses" {
   description = "Addresses* of consul servers in cluster to join."
   type        = "list"
+}
+
+variable "vault_tls_cert_file_path" {
+  description = "Specifies the path to the certificate for TLS. Required. To use a CA certificate, concatenate the primary certificate and the CA certificate together."
+}
+
+variable "vault_tls_key_file_path" {
+  description = "Specifies the path to the private key for the certificate."
+}
+
+variable "consul_tls_cert_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_tls_key_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_tls_ca_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_install_path" {
+  description = "Path where consul is installed"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -129,14 +157,4 @@ variable "cluster_port" {
 variable "consul_http_api_port" {
   description = "The port used by consul http api.  Consul default is 8500."
   default     = 8500
-}
-
-variable "tls_cert_path" {
-  description = "Specifies the path to the certificate for TLS. Required. To use a CA certificate, concatenate the primary certificate and the CA certificate together."
-  default     = "/etc/vault/tls/vault.crt.pem"
-}
-
-variable "tls_key_path" {
-  description = "Specifies the path to the private key for the certificate."
-  default     = "/etc/vault/tls/vault.key.pem"
 }

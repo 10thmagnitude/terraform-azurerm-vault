@@ -72,14 +72,18 @@ module "consul_servers" {
 
   resource_group_name = "${azurerm_resource_group.vault.name}"
 
-  location             = "${var.location}"
-  instance_size        = "${var.instance_size}"
-  admin_user_name      = "${var.admin_user_name}"
-  bastion_host_address = "${data.azurerm_public_ip.bastion.ip_address}"
-  private_key_path     = "${file(var.private_key_path)}"
-  instance_size        = "${var.instance_size}"
-  image_id             = "${data.azurerm_image.vault.id}"
-  subnet_id            = "${azurerm_subnet.consul.id}"
+  location              = "${var.location}"
+  instance_size         = "${var.instance_size}"
+  admin_user_name       = "${var.admin_user_name}"
+  bastion_host_address  = "${data.azurerm_public_ip.bastion.ip_address}"
+  private_key_path      = "${file(var.private_key_path)}"
+  image_id              = "${data.azurerm_image.vault.id}"
+  subnet_id             = "${azurerm_subnet.consul.id}"
+  gossip_encryption_key = "${var.gossip_encryption_key}"
+  consul_install_path   = "/etc/consul.d/"
+  tls_key_file_path     = "/etc/consul.d/tls/vault.key.pem"
+  tls_cert_file_path    = "/etc/consul.d/tls/vault.crt.pem"
+  tls_ca_file_path      = "/etc/consul.d/tls/ca.crt.pem"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -100,15 +104,22 @@ module "vault_servers" {
 
   resource_group_name = "${azurerm_resource_group.vault.name}"
 
-  location                 = "${var.location}"
-  instance_size            = "${var.instance_size}"
-  admin_user_name          = "${var.admin_user_name}"
-  bastion_host_address     = "${data.azurerm_public_ip.bastion.ip_address}"
-  private_key_path         = "${file(var.private_key_path)}"
-  image_id                 = "${data.azurerm_image.vault.id}"
-  subnet_id                = "${azurerm_subnet.vault.id}"
-  consul_cluster_addresses = ["${module.consul_servers.cluster_ip_addresses}"]
-  consul_http_api_port     = "${module.consul_servers.consul_http_api_port}"
+  location                  = "${var.location}"
+  instance_size             = "${var.instance_size}"
+  admin_user_name           = "${var.admin_user_name}"
+  bastion_host_address      = "${data.azurerm_public_ip.bastion.ip_address}"
+  private_key_path          = "${file(var.private_key_path)}"
+  image_id                  = "${data.azurerm_image.vault.id}"
+  subnet_id                 = "${azurerm_subnet.vault.id}"
+  consul_cluster_addresses  = ["${module.consul_servers.cluster_ip_addresses}"]
+  consul_http_api_port      = "${module.consul_servers.consul_http_api_port}"
+  gossip_encryption_key     = "${var.gossip_encryption_key}"
+  consul_install_path       = "/etc/consul.d"
+  consul_tls_key_file_path  = "/etc/consul.d/tls/vault.key.pem"
+  consul_tls_cert_file_path = "/etc/consul.d/tls/vault.crt.pem"
+  consul_tls_ca_file_path   = "/etc/consul.d/tls/ca.crt.pem"
+  vault_tls_key_file_path   = "/etc/vault.d/tls/vault.key.pem"
+  vault_tls_cert_file_path  = "/etc/vault.d/tls/vault.crt.pem"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

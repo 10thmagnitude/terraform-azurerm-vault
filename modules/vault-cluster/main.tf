@@ -11,6 +11,11 @@ data "template_file" "consul" {
     consul_client_name    = "${format("${var.vault_computer_name_prefix}-%02d", 1 + count.index)}"
     consul_join_addresses = "${jsonencode(var.consul_cluster_addresses)}"
     http_port             = "${var.consul_http_api_port}"
+    consul_install_path   = "${var.consul_install_path}"
+    tls_key_file_path     = "${var.consul_tls_key_file_path}"
+    tls_cert_file_path    = "${var.consul_tls_cert_file_path}"
+    tls_ca_file_path      = "${var.consul_tls_ca_file_path}"
+    gossip_encryption_key = "${var.gossip_encryption_key}"
   }
 }
 
@@ -19,11 +24,14 @@ data "template_file" "vault" {
   template = "${file("${path.module}/files/vault-config-hcl")}"
 
   vars {
-    instance_ip_address = "${azurerm_network_interface.vault.*.private_ip_address[count.index]}"
-    port                = "${var.api_port}"
-    cluster_port        = "${var.cluster_port}"
-    tls_cert_file       = "${var.tls_cert_path}"
-    tls_key_file        = "${var.tls_key_path}"
+    instance_ip_address       = "${azurerm_network_interface.vault.*.private_ip_address[count.index]}"
+    port                      = "${var.api_port}"
+    cluster_port              = "${var.cluster_port}"
+    consul_tls_key_file_path  = "${var.consul_tls_key_file_path}"
+    consul_tls_cert_file_path = "${var.consul_tls_cert_file_path}"
+    consul_tls_ca_file_path   = "${var.consul_tls_ca_file_path}"
+    vault_tls_cert_file_path  = "${var.vault_tls_cert_file_path}"
+    vault_tls_key_file_path   = "${var.vault_tls_key_file_path}"
   }
 }
 

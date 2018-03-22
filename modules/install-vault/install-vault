@@ -6,7 +6,7 @@
 
 set -e
 
-readonly DEFAULT_INSTALL_PATH="/etc/vault"
+readonly DEFAULT_INSTALL_PATH="/etc/vault.d"
 readonly DEFAULT_VAULT_USER="vault"
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
