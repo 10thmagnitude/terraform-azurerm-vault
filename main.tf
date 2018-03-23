@@ -81,8 +81,8 @@ module "consul_servers" {
   subnet_id             = "${azurerm_subnet.consul.id}"
   gossip_encryption_key = "${var.gossip_encryption_key}"
   consul_install_path   = "/etc/consul.d/"
-  tls_key_file_path     = "/etc/consul.d/tls/vault.key.pem"
-  tls_cert_file_path    = "/etc/consul.d/tls/vault.crt.pem"
+  tls_key_file_path     = "/etc/consul.d/tls/consul.key.pem"
+  tls_cert_file_path    = "/etc/consul.d/tls/consul.crt.pem"
   tls_ca_file_path      = "/etc/consul.d/tls/ca.crt.pem"
 }
 
@@ -115,8 +115,8 @@ module "vault_servers" {
   consul_http_api_port      = "${module.consul_servers.consul_http_api_port}"
   gossip_encryption_key     = "${var.gossip_encryption_key}"
   consul_install_path       = "/etc/consul.d"
-  consul_tls_key_file_path  = "/etc/consul.d/tls/vault.key.pem"
-  consul_tls_cert_file_path = "/etc/consul.d/tls/vault.crt.pem"
+  consul_tls_key_file_path  = "/etc/consul.d/tls/consul.key.pem"
+  consul_tls_cert_file_path = "/etc/consul.d/tls/consul.crt.pem"
   consul_tls_ca_file_path   = "/etc/consul.d/tls/ca.crt.pem"
   vault_tls_key_file_path   = "/etc/vault.d/tls/vault.key.pem"
   vault_tls_cert_file_path  = "/etc/vault.d/tls/vault.crt.pem"

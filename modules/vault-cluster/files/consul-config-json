@@ -4,10 +4,10 @@
   "data_dir":             "${consul_install_path}/data/",
   "retry_join":           ${consul_join_addresses},
   "addresses":            {
-                            "http": "127.0.0.1",
                             "https": "127.0.0.1"
                           },
   "ports":                {
+                            "http": -1,
                             "https": ${http_port}
                           },
   "encrypt":              "${gossip_encryption_key}",
