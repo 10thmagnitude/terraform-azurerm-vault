@@ -98,8 +98,7 @@ module "vault_servers" {
 
   cluster_name = "${var.vault_cluster_name}"
 
-  # cluster_size = "${var.vault_num_servers}"
-  cluster_size = 1
+  cluster_size = "${var.vault_num_servers}"
   key_data     = "${var.key_data}"
 
   resource_group_name = "${azurerm_resource_group.vault.name}"
