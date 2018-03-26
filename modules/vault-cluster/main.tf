@@ -39,6 +39,16 @@ data "template_file" "vault" {
   }
 }
 
+data "template_file" "custom_data_vault" {
+  count    = "${var.cluster_size}"
+  template = "${file("${path.module}/files/vault-run-sh")}"
+
+  vars {
+    consul_config = "${data.template_file.consul.*.rendered[count.index]}"
+    vault_config  = "${data.template_file.vault.*.rendered[count.index]}"
+  }
+}
+
 #---------------------------------------------------------------------------------------------------------------------
 # CREATE NETWORK INTERFACES TO RUN VAULT
 # ---------------------------------------------------------------------------------------------------------------------
@@ -86,6 +96,7 @@ resource "azurerm_virtual_machine" "vault" {
     computer_name  = "${format("${var.vault_computer_name_prefix}-%02d", 1 + count.index)}"
     admin_username = "${var.admin_user_name}"
     admin_password = "${uuid()}"
+    custom_data    = "${data.template_file.custom_data_vault.*.rendered[count.index]}"
   }
 
   os_profile_linux_config {
@@ -95,35 +106,6 @@ resource "azurerm_virtual_machine" "vault" {
       path     = "/home/${var.admin_user_name}/.ssh/authorized_keys"
       key_data = "${var.key_data}"
     }
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.consul.*.rendered[count.index]}"
-    destination = "/tmp/config.json.moveme"
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.vault.*.rendered[count.index]}"
-    destination = "/tmp/default.hcl.moveme"
-  }
-
-  provisioner "file" {
-    content     = "${file("${path.module}/files/vault-run-sh")}"
-    destination = "/tmp/vault-run.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo chmod +x /tmp/vault-run.sh",
-      "sudo /bin/bash -c /tmp/vault-run.sh",
-    ]
-  }
-
-  connection {
-    user         = "${var.admin_user_name}"
-    host         = "${azurerm_network_interface.vault.*.private_ip_address[count.index]}"
-    private_key  = "${var.private_key_path}"
-    bastion_host = "${var.bastion_host_address}"
   }
 
   lifecycle {

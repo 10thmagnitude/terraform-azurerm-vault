@@ -75,8 +75,6 @@ module "consul_servers" {
   location              = "${var.location}"
   instance_size         = "${var.instance_size}"
   admin_user_name       = "${var.admin_user_name}"
-  bastion_host_address  = "${data.azurerm_public_ip.bastion.ip_address}"
-  private_key_path      = "${file(var.private_key_path)}"
   image_id              = "${data.azurerm_image.vault.id}"
   subnet_id             = "${azurerm_subnet.consul.id}"
   gossip_encryption_key = "${var.gossip_encryption_key}"
@@ -106,8 +104,6 @@ module "vault_servers" {
   location                  = "${var.location}"
   instance_size             = "${var.instance_size}"
   admin_user_name           = "${var.admin_user_name}"
-  bastion_host_address      = "${data.azurerm_public_ip.bastion.ip_address}"
-  private_key_path          = "${file(var.private_key_path)}"
   image_id                  = "${data.azurerm_image.vault.id}"
   subnet_id                 = "${azurerm_subnet.vault.id}"
   consul_cluster_addresses  = ["${module.consul_servers.cluster_ip_addresses}"]

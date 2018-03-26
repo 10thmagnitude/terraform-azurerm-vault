@@ -35,14 +35,6 @@ variable "gossip_encryption_key" {
   description = "The encryption key for consul to encrypt gossip traffic"
 }
 
-variable "private_key_path" {
-  description = "The local path of the ssh private key"
-}
-
-variable "bastion_host_address" {
-  description = "The ip address of the bastion host"
-}
-
 variable "consul_cluster_addresses" {
   description = "Addresses* of consul servers in cluster to join."
   type        = "list"
@@ -157,4 +149,10 @@ variable "cluster_port" {
 variable "consul_http_api_port" {
   description = "The port used by consul http api.  Consul default is 8500."
   default     = 8500
+}
+
+variable "tags" {
+  type        = "map"
+  description = "A map of the tags to use on the resources that are deployed with this module."
+  default     = {}
 }

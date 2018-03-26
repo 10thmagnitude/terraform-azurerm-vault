@@ -1,7 +1,7 @@
 {
   "node_name":            "${consul_client_name}",
   "datacenter":           "${location}",
-  "data_dir":             "${consul_install_path}/data/",
+  "data_dir":             "${consul_install_path}data/",
   "retry_join":           ${consul_join_addresses},
   "addresses":            {
                             "https": "127.0.0.1"
