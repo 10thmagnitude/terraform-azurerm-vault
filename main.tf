@@ -78,7 +78,7 @@ module "consul_servers" {
   image_id              = "${data.azurerm_image.vault.id}"
   subnet_id             = "${azurerm_subnet.consul.id}"
   gossip_encryption_key = "${var.gossip_encryption_key}"
-  consul_install_path   = "/etc/consul.d/"
+  consul_install_path   = "/etc/consul.d"
   tls_key_file_path     = "/etc/consul.d/tls/consul.key.pem"
   tls_cert_file_path    = "/etc/consul.d/tls/consul.crt.pem"
   tls_ca_file_path      = "/etc/consul.d/tls/ca.crt.pem"

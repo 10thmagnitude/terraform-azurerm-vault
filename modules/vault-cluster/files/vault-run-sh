@@ -1,9 +1,7 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -eux
 
 # Send the log output from this script to custom-data.log
-exec >>tee /var/log/custom-data.log 2>&1
+exec 2> >(sudo tee -a /var/log/custom-data.log)
 
 sudo echo '${consul_config}' > /etc/consul.d/config/config.json
 sudo echo '${vault_config}' > /etc/vault.d/config/default.hcl
