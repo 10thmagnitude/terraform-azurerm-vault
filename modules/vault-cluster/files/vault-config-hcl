@@ -20,5 +20,3 @@ listener "tcp" {
   tls_key_file    = "${vault_tls_key_file_path}"
   tls_min_version = "tls12"
 }
-
-ui = true
