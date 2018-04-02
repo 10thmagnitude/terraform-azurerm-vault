@@ -1,92 +1,158 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # REQUIRED PARAMETERS
+# You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "subscription_id" {
-  description = "The Azure subscription ID"
+variable "location" {
+  description = "The location that the resources will run in (e.g. East US)"
 }
-
-variable "tenant_id" {
-  description = "The Azure tenant ID"
-}
-
-variable "client_id" {
-  description = "The Azure client ID"
-}
-
-variable "client_secret" {
-  description = "The Azure secret access key"
-}
-
-variable "image_resource_group_name" {}
 
 variable "resource_group_name" {
-  default = "catavault"
+  description = "The name of the resource group that the resources for consul will run in"
 }
 
-variable "image_regex" {
-  description = "The expression to find the managed Azure image that should be deployed to the consul cluster."
-  default     = "com.lgc.vault-centos-7.3-v*"
+variable "subnet_id" {
+  description = "The id of the subnet to deploy the cluster into"
 }
 
-variable "admin_user_name" {
-  default = "haladmin"
+variable "cluster_name" {
+  description = "The name of the Consul cluster (e.g. consul-stage). This variable is used to namespace all resources created by this module."
+}
+
+variable "image_id" {
+  description = "The URL of the Image to run in this cluster. Should be an image that had Consul installed and configured by the install-consul module."
+}
+
+variable "instance_size" {
+  description = "The size of Azure Instances to run for each node in the cluster (e.g. Standard_A0)."
 }
 
 variable "key_data" {
   description = "The SSH public key that will be added to SSH authorized_users on the consul instances"
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDE/k1xTljO8cw3knf1jsnLhs0QMyCkM1ZlIRiIEAFZtlrkzdTuVDHBFKZmRKBeBH7ozogyeUVnqsaBFdqm8dH7z7Mp5ecCz/bBxOp/XsTSuXSrjgemgdiievFmtwYvIdraEYJr9fUYid6zWrC3tkbM7GVvrS+BKaDwK33QbN99/NQxtGpeWO6ivqhWu4+8KrAeL8rllsAhEzl8JuzOeNRdsVzwjaHgoUfK0d+SfNOJVjNrY8IIdq2Czi+b+iORh4iamwXkefT89Nnk5Ipri/SvliE9GatbHTbMktHsKZ5ZS9Hb0mVAdfevBViPXcZ1Tyamt08r6BIsKQNbbpQ4xYUJxGFm76jU0RbPwjCP8Tg5shn1/SKew56eDRtvIiJV0dp+Mp5R5vzbfrMaCzyZNdvFtdowq9mKc9N+J+9FyMHzgMOFBuwstSC6XuTUF+2nc2NZDYgqTmwgaLOrPkyoOM1FGI9uFGYacGI1ekMY4hcJZ8237I9nCdTyqnJro0rIn2erv3hkZBidBk1jrDCiEJuaiVQ/sWQT/tn06JQBNwny532SnJxBRaPuhUEDMJNoKFh2k6MJ3QPrgr3x2Ygx9/s5dAxwOI/QBy8bkT4gCb3JySi1kozTM3XssWOU4JfziE9fdDQo70yVYhGXcv0RPC1kX5bsoo1/ExeyLDKobhfAyQ== haladmin@core-hal"
 }
 
 variable "gossip_encryption_key" {
   description = "The encryption key for consul to encrypt gossip traffic"
 }
 
+variable "consul_cluster_addresses" {
+  description = "Addresses* of consul servers in cluster to join."
+  type        = "list"
+}
+
+variable "vault_tls_cert_file_path" {
+  description = "Specifies the path to the certificate for TLS. Required. To use a CA certificate, concatenate the primary certificate and the CA certificate together."
+}
+
+variable "vault_tls_key_file_path" {
+  description = "Specifies the path to the private key for the certificate."
+}
+
+variable "consul_tls_cert_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_tls_key_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_tls_ca_file_path" {
+  description = "Specifies the path to the certificate for TLS."
+}
+
+variable "consul_install_path" {
+  description = "Path where consul is installed"
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
-variable "location" {
-  description = "The Azure region the consul cluster will be deployed in"
-  default     = "East US"
+
+variable "instance_tier" {
+  description = "Specifies the tier of virtual machines in a scale set. Possible values, standard or basic."
+  default     = "standard"
 }
 
-variable "test_address_space" {
-  description = "The supernet for the resources that will be created"
-  default     = "10.0.0.0/16"
+variable "consul_computer_name_prefix" {
+  description = "The string that the name of each instance in the cluster will be prefixed with"
+  default     = "consul"
 }
 
-variable "test_consul_subnet_address" {
-  description = "The subnet that consul resources will be deployed into"
-  default     = "10.0.10.0/24"
+variable "vault_computer_name_prefix" {
+  description = "The string that the name of each instance in the cluster will be prefixed with"
+  default     = "vault"
 }
 
-variable "test_vault_subnet_address" {
-  description = "The subnet that vault resources will be deployed into"
-  default     = "10.0.11.0/24"
+variable "admin_user_name" {
+  description = "The name of the administrator user for each instance in the cluster"
+  default     = "vaultadmin"
 }
 
-variable "consul_cluster_name" {
-  description = "What to name the Consul cluster and all of its associated resources"
-  default     = "consul-example"
+variable "instance_root_volume_size" {
+  description = "Specifies the size of the instance root volume in GB. Default 40GB"
+  default     = 40
 }
 
-variable "vault_cluster_name" {
-  description = "What to name the Vault cluster and all of its associated resources"
-  default     = "vault-example"
-}
-
-variable "instance_size" {
-  description = "The instance size for the servers"
-  default     = "Standard_A1_v2"
-}
-
-variable "consul_num_servers" {
-  description = "The number of Consul server nodes to deploy. We strongly recommend using 3 or 5."
+variable "cluster_size" {
+  description = "The number of nodes to have in the Consul cluster. We strongly recommended that you use either 3 or 5."
   default     = 3
 }
 
-variable "vault_num_servers" {
-  description = "The number of Vault server nodes to deploy. We strongly recommend using 3 or 5."
-  default     = 3
+variable "cluster_tag_key" {
+  description = "Add a tag with this key and the value var.cluster_tag_value to each Instance in the ASG. This can be used to automatically find other Consul nodes and form a cluster."
+  default     = "consul-servers"
+}
+
+variable "cluster_tag_value" {
+  description = "Add a tag with key var.clsuter_tag_key and this value to each Instance in the ASG. This can be used to automatically find other Consul nodes and form a cluster."
+  default     = "auto-join"
+}
+
+variable "subnet_ids" {
+  description = "The subnet IDs into which the Azure Instances should be deployed. We recommend one subnet ID per node in the cluster_size variable. At least one of var.subnet_ids or var.availability_zones must be non-empty."
+  type        = "list"
+  default     = []
+}
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "A list of CIDR-formatted IP address ranges from which the Azure Instances will allow SSH connections"
+  type        = "list"
+  default     = []
+}
+
+variable "root_volume_type" {
+  description = "The type of volume. Must be one of: standard, gp2, or io1."
+  default     = "standard"
+}
+
+variable "root_volume_size" {
+  description = "The size, in GB, of the root EBS volume."
+  default     = 50
+}
+
+variable "root_volume_delete_on_termination" {
+  description = "Whether the volume should be destroyed on instance termination."
+  default     = true
+}
+
+variable "api_port" {
+  description = "The port to use for Vault API calls. Vault default is 8200"
+  default     = 8200
+}
+
+variable "cluster_port" {
+  description = "The port to use for Vault cluster server-to-server requests. Vault default is 8201"
+  default     = 8201
+}
+
+variable "consul_http_api_port" {
+  description = "The port used by consul http api.  Consul default is 8500."
+  default     = 8500
+}
+
+variable "tags" {
+  type        = "map"
+  description = "A map of the tags to use on the resources that are deployed with this module."
+  default     = {}
 }
