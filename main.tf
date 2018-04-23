@@ -50,6 +50,19 @@ data "template_file" "custom_data_vault" {
 }
 
 #---------------------------------------------------------------------------------------------------------------------
+# AVAILABILITY SET FOR VAULT NODES
+#---------------------------------------------------------------------------------------------------------------------
+
+resource "azurerm_availability_set" "vault" {
+  name                = "${var.cluster_prefix}"
+  location            = "${var.location}"
+  resource_group_name = "${data.azurerm_resource_group.vault.name}"
+  managed             = true
+
+  tags = "${var.tags}"
+}
+
+#---------------------------------------------------------------------------------------------------------------------
 # CREATE NETWORK INTERFACES TO RUN VAULT
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -75,6 +88,7 @@ resource "azurerm_virtual_machine" "vault" {
   name                             = "${format("${var.vault_computer_name_prefix}-%02d", 1 + count.index)}"
   location                         = "${var.location}"
   resource_group_name              = "${data.azurerm_resource_group.vault.name}"
+  availability_set_id              = "${azurerm_availability_set.vault.id}"
   network_interface_ids            = ["${azurerm_network_interface.vault.*.id[count.index]}"]
   vm_size                          = "${var.instance_size}"
   delete_os_disk_on_termination    = true
