@@ -54,7 +54,7 @@ data "template_file" "custom_data_vault" {
 #---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_availability_set" "vault" {
-  name                = "${var.cluster_prefix}"
+  name                = "${var.cluster_name}"
   location            = "${var.location}"
   resource_group_name = "${data.azurerm_resource_group.vault.name}"
   managed             = true
